@@ -8,6 +8,17 @@ using namespace std;
 
 const string ClientsFileName = "Client.txt";
 
+enum enMainMenuOptions {
+
+	eListClients = 1,
+	eAddNewClient = 2,
+	eDeleteClient = 3,
+	eUpdateClient = 4,
+	eFindClient = 5,
+	eExit = 6
+
+};
+
 struct sClient {
 
 	string AccountNumber = "";
@@ -434,7 +445,20 @@ void FindClientByAccountNumberScreen(vector<sClient>const&vClints) {
 
 }
 
+void ShowMainMenu() {
 
+	cout << "=====================================\n";
+	cout << "\t\tMain Menu Screen\n";
+	cout << "=====================================\n";
+	cout << "\t[1] Show Client List.\n";
+	cout << "\t[2] Add New Client List.\n";
+	cout << "\t[3] Delete Client.\n";
+	cout << "\t[4] Update Client Info.\n";
+	cout << "\t[5] Find Client.\n";
+	cout << "\t[6] Exit.\n";
+	cout << "=====================================\n";
+
+}
 
 int main()
 {
