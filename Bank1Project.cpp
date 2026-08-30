@@ -480,7 +480,7 @@ void FindClientByAccountNumberScreen(string AccountNumber, vector<sClient>const&
 
 void Deposit(string AccountNumber, vector<sClient>& vClients) {
 
-	double DepositAmount = ReadAmount();
+	double DepositAmount = ReadDepositAmount();
 	char Confirm = 'y';
 
 	cout << "\n\nAre you sure you want perform this transaction? y/n ? ";
@@ -519,13 +519,22 @@ void WithDraw(string AccountNumber, vector<sClient>& vClients) {
 
 			}
 
-			cout<<"Are you sure you wnat"
+			cout << "Are you sure you wnat to perform this tranaction? y/n? ";
+			cin >> Confirm;
 
-			Client.AccountBalance -= WithdrawAmount;
+			if (toupper(Confirm) == 'Y') {
+
+				Client.AccountBalance -= WithdrawAmount;
+
+				cout << "\nDone successfully new balance is : " << Client.AccountBalance << endl;
+				break;
+			}
 
 		}
 
 	}
+
+	SaveClientsToFile(vClients);
 
 }
 
@@ -646,11 +655,11 @@ void ShowWithdrawScreen(vector<sClient>& vClients) {
 	}
 
 	PrintClientDetails(Client);
-
+	WithDraw(AccountNumber,vClients);
 
 }
 
-void ShowTransactions();
+void ShowTransactions(vector<sClient>&vClients);
 	
 void GoBackToTransactions(vector<sClient>& vClients) {
 
@@ -704,7 +713,9 @@ void PerformTransactions(enTranactionsOptions Option, vector<sClient>& vClients)
 	case enTranactionsOptions::eWithdraw:
 
 		system("cls");
-
+		ShowWithdrawScreen(vClients);
+		GoBackToTransactions(vClients);
+		break;
 
 	case enTranactionsOptions::eTotalBalance:
 
@@ -798,7 +809,7 @@ void PerformMainMenuOptions(enMainMenuOptions Option, vector<sClient>& vClients)
 void ShowMainMenu(vector<sClient>& vClients) {
 
 	ShowMainMenuTable();
-	PerformMainMenuOptions((enMainMenuOptions)ReadChoice(1, 6), vClients);
+	PerformMainMenuOptions((enMainMenuOptions)ReadChoice(1, 7), vClients);
 
 }
 
