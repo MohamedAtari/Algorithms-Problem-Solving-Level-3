@@ -7,6 +7,10 @@
 #include <limits>
 using namespace std;
 
+/*===============================================================
+              1. GLOBAL CONSTANTS & DATA STRUCTURES
+  ===============================================================*/
+
 const string ClientsFileName = "Client.txt";
 
 enum enMainMenuOptions {
@@ -31,15 +35,9 @@ struct sClient {
 
 };
 
-string ReadAccountNumber() {
-
-	string AccountNumber = "";
-
-	cout << "Enter Account Number ? ";
-	getline(cin >> ws, AccountNumber);
-
-	return AccountNumber;
-}
+ /*==================================================
+                 2. STRING UTLITIS        
+   ==================================================*/
 
 vector<string> SplitString(string Line, string Delim) {
 
@@ -76,6 +74,23 @@ sClient ConvertLineToRecord(string Line,string Delim = "#//#") {
 	return Client;
 }
 
+string ConvertRecordToLine(const sClient& Client, string Delim = "#//#") {
+
+	string Line = "";
+
+	Line = Client.AccountNumber + Delim;
+	Line += Client.PinCode + Delim;
+	Line += Client.Name + Delim;
+	Line += Client.Phone + Delim;
+	Line += to_string(Client.AccountBalance);
+
+	return Line;
+}
+
+/*====================================================
+				3. File I/O Operations
+  ====================================================*/
+
 vector<sClient>LoadClientsFromFile() {
 
 	fstream MyFile;
@@ -102,9 +117,64 @@ vector<sClient>LoadClientsFromFile() {
 	return vClients;
 }
 
+void AddClientToFile(const sClient& Client) {
+
+	fstream MyFile;
+
+	MyFile.open(ClientsFileName, ios::out | ios::app);
+
+	if (MyFile.is_open()) {
+
+		MyFile << ConvertRecordToLine(Client) << endl;
+
+		MyFile.close();
+	}
+
+}
+
+void SaveClientsToFile(vector<sClient>& vClients) {
+
+	fstream MyFile;
+
+	MyFile.open(ClientsFileName, ios::out);
+
+	if (MyFile.is_open()) {
+
+		for (sClient& Client : vClients) {
+
+			if (!Client.MarkToDelete) {
+				MyFile << ConvertRecordToLine(Client) << endl;
+			}
+
+		}
+		MyFile.close();
+	}
+
+}
+
+/* ============================================================================
+                 4. UI & PRESENTATION , Headers & Tables
+   ============================================================================*/
+
+void ShowMainMenuTable() {
+
+	system("cls");
+	cout << "=============================================\n";
+	cout << "\t\tMain Menu Screen\n";
+	cout << "=============================================\n";
+	cout << "\t[1] Show Client List.\n";
+	cout << "\t[2] Add New Client.\n";
+	cout << "\t[3] Delete Client.\n";
+	cout << "\t[4] Update Client Info.\n";
+	cout << "\t[5] Find Client.\n";
+	cout << "\t[6] Exit.\n";
+	cout << "=============================================\n";
+
+}
+
 void ShowAddNewClientsScreen() {
 
-	cout << "\n-------------------------------------\n"; 
+	cout << "-------------------------------------\n"; 
 	cout << "\tAdd New Client Screen";
 	cout << "\n-------------------------------------\n";
 
@@ -112,7 +182,7 @@ void ShowAddNewClientsScreen() {
 
 void ShowDeleteClientScreen() {
 
-	cout << "\n-------------------------------------\n";
+	cout << "-------------------------------------\n";
 	cout << "\tDelete Client Screen";
 	cout << "\n-------------------------------------\n";
 
@@ -120,7 +190,7 @@ void ShowDeleteClientScreen() {
 
 void ShowUpdateClientInfoScreen() {
 
-	cout << "\n-------------------------------------\n";
+	cout << "-------------------------------------\n";
 	cout << "\tUpdate Client Info Screen";
 	cout << "\n-------------------------------------\n";
 
@@ -128,7 +198,7 @@ void ShowUpdateClientInfoScreen() {
 
 void ShowFindClientScreen() {
 
-	cout << "\n-------------------------------------\n";
+	cout << "-------------------------------------\n";
 	cout << "\tFind Client Screen";
 	cout << "\n-------------------------------------\n";
 
@@ -136,11 +206,58 @@ void ShowFindClientScreen() {
 
 void ShowExitScreen() {
 
-	cout << "\n-------------------------------------\n";
+	cout << "------------------------------------ - \n";
 	cout << "\tProgram Ends :-)";
 	cout << "\n-------------------------------------\n";
 
 }
+
+void PrintRecord(sClient const& Client) {
+
+	cout << "|" << left << setw(16) << Client.AccountNumber;
+	cout << "|" << left << setw(12) << Client.PinCode;
+	cout << "|" << left << setw(20) << Client.Name;
+	cout << "|" << left << setw(17) << Client.Phone;
+	cout << "|" << left << setw(16) << Client.AccountBalance;
+	cout << endl;
+
+}
+
+void PrintClientsTable(vector<sClient> const& vClients) {
+
+	cout << "\n\t\t\t\tClients List (" << vClients.size() << ") Client(s).\n\n";
+	cout << "--------------------------------------------------------------------------------------\n\n";
+	cout << "|" << left << setw(16) << "Account Number";
+	cout << "|" << left << setw(12) << "PinCode";
+	cout << "|" << left << setw(20) << "Client Name";
+	cout << "|" << left << setw(17) << "Phone Number";
+	cout << "|" << left << setw(16) << "Account Balance";
+	cout << "\n\n--------------------------------------------------------------------------------------\n";
+
+	for (const sClient& Client : vClients) {
+
+		PrintRecord(Client);
+
+	}
+
+	cout << "\n--------------------------------------------------------------------------------------\n\n";
+
+}
+
+void PrintClientDetails(const sClient& Client) {
+	cout << "\nThe Following Are The Client Details : ";
+	cout << "\n-------------------------------";
+	cout << "\nAccount Number  : " << Client.AccountNumber;
+	cout << "\nPin Code        : " << Client.PinCode;
+	cout << "\nName            : " << Client.Name;
+	cout << "\nPhone Number    : " << Client.Phone;
+	cout << "\nAccount Balance : " << Client.AccountBalance;
+	cout << "\n-------------------------------\n\n";
+}
+
+/* ============================================================================
+                       5.INPUT & VALIDATION FUNCTIONS
+   ============================================================================*/
 
 double ReadAccountBalance() {
 
@@ -163,39 +280,40 @@ double ReadAccountBalance() {
 	return AccountBalance;
 }
 
+short ReadChoice(short From, short To) {
 
-void PrintRecord(sClient const &Client) {
+	short Choice = From - 1;
 
-	cout << "|" << left << setw(16) << Client.AccountNumber;
-	cout << "|" << left << setw(12) << Client.PinCode;
-	cout << "|" << left << setw(15) << Client.Name;
-	cout << "|" << left << setw(17) << Client.Phone;
-	cout << "|" << left << setw(16) << Client.AccountBalance;
-	cout << endl;
+	while (true) {
 
-}
+		cout << "Enter what do you want to do? [" << From << "-" << To << "]? ";
+		cin >> Choice;
 
-void PrintClientsTable(vector<sClient> const& vClients) {
+		if (!cin.fail() && (Choice <= To && Choice >= From)) {
+			break;
+		}
 
-	cout << "\n\t\t\t\tClients List (" << vClients.size() << ") Client(s).\n\n";
-	cout << "--------------------------------------------------------------------------------\n\n";
-	cout << "|" << left << setw(16) << "Account Number";
-	cout << "|" << left << setw(12) << "PinCode";
-	cout << "|" << left << setw(15) << "Client Name";
-	cout << "|" << left << setw(17) << "Phone Number";
-	cout << "|" << left << setw(16) << "Account Balance";
-	cout << "\n\n--------------------------------------------------------------------------------\n";
-
-	for (const sClient& Client : vClients) {
-
-		PrintRecord(Client);
+		cout << "\nInvalid Input Please Enter A Number. \n";
+		cin.clear();
+		cin.ignore(numeric_limits<streamsize>::max(), '\n');
 
 	}
-
-	cout << "\n--------------------------------------------------------------------------------\n\n";
-
+	return Choice;
 }
-//Add Clinets
+
+string ReadAccountNumber() {
+
+	string AccountNumber = "";
+
+	cout << "Enter Account Number ? ";
+	getline(cin >> ws, AccountNumber);
+
+	return AccountNumber;
+}
+
+/* ============================================================================
+                      6. CORE BANK LOGIC 
+   ============================================================================*/
 
 bool FindClientByAccountNumber(string AccountNumber,vector<sClient>const &vClients ,sClient &Client) {
 
@@ -239,34 +357,6 @@ sClient ReadNewClient(vector<sClient>const& vClients) {
 	return Client;
 }
 
-string ConvertRecordToLine(sClient &Client,string Delim = "#//#") {
-
-	string Line = "";
-
-	Line = Client.AccountNumber + Delim;
-	Line += Client.PinCode + Delim;
-	Line += Client.Name + Delim;
-	Line += Client.Phone + Delim;
-	Line += to_string(Client.AccountBalance);
-
-	return Line;
-}
-
-void AddClientToFile(sClient &Client) {
-
-	fstream MyFile;
-	
-	MyFile.open(ClientsFileName, ios::out | ios::app);
-
-	if (MyFile.is_open()) {
-
-		MyFile << ConvertRecordToLine(Client) << endl;
-		
-		MyFile.close();
-	}
-
-}
-
 void AddNewClient(vector<sClient> &vClients) {
 
 	sClient Client = ReadNewClient(vClients);
@@ -289,21 +379,6 @@ void AddNewClients(vector<sClient>& vClients) {
 	
 }
 
-//Delete Clients
-
-void PrintClientDetails(const sClient &Client) {
-
-	cout << "\nThe Folowing Are The Clients Details : ";
-	cout << "\n-------------------------------";
-	cout << "\nAccount Number  : " << Client.AccountNumber;
-	cout << "\nPin Code        : " << Client.PinCode;
-	cout << "\nName            : " << Client.Name;
-	cout << "\nPhone Number    : " << Client.Phone;
-	cout << "\nAccount Balance : " << Client.AccountBalance;
-	cout << "\n-------------------------------\n\n";
-
-}
-
 void MarkClientToDeleteByAccountNumber(string AccountNumber,vector<sClient>& vClients) {
 
 	for (sClient& Client : vClients) {
@@ -317,25 +392,6 @@ void MarkClientToDeleteByAccountNumber(string AccountNumber,vector<sClient>& vCl
 
 }
 
-void SaveClientsToFile(vector<sClient>& vClients) {
-
-	fstream MyFile;
-
-	MyFile.open(ClientsFileName, ios::out);
-
-	if (MyFile.is_open()) {
-
-		for (sClient& Client : vClients) {
-
-			if (!Client.MarkToDelete) {
-				MyFile << ConvertRecordToLine(Client) << endl;
-			}
-
-		}
-		MyFile.close();
-	}
-
-}
 
 bool DeleteClientsByAccountNumber(string AccountNumber,vector<sClient>&vClients) {
 
@@ -450,21 +506,9 @@ void FindClientByAccountNumberScreen(string AccountNumber,vector<sClient>const&v
 
 }
 
-void ShowMainMenuTable() {
-
-	system("cls");
-	cout << "=====================================\n";
-	cout << "\t\tMain Menu Screen\n";
-	cout << "=====================================\n";
-	cout << "\t[1] Show Client List.\n";
-	cout << "\t[2] Add New Client List.\n";
-	cout << "\t[3] Delete Client.\n";
-	cout << "\t[4] Update Client Info.\n";
-	cout << "\t[5] Find Client.\n";
-	cout << "\t[6] Exit.\n";
-	cout << "=====================================\n";
-
-}
+/*============================================================================
+                        7.CONTROLLERS & ENGINE 
+  ============================================================================*/
 
 void GoBackToMainMenu() {
 
@@ -535,27 +579,6 @@ void PerformMainMenuOptions(enMainMenuOptions Option, vector<sClient>& vClients)
 
 }
 
-short ReadChoice(short From, short To) {
-
-	short Choice = From - 1;
-
-	while ((Choice > To || Choice < From )&& true) {
-
-		cout << "Enter what do you want to do? [" << From << "-" << To << "]? ";
-		cin >> Choice;
-
-		if (!cin.fail()&& (Choice <= To && Choice >= From)) {
-			break;
-		}
-
-		cout << "\nInvalid Input Please Enter A Number. \n";
-		cin.clear();
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-	}
-	return Choice;
-}
-
 void StartBankingSystem() {
 
 	vector<sClient>vClients = LoadClientsFromFile();
@@ -571,11 +594,15 @@ void StartBankingSystem() {
 
 }
 
+/* ============================================================================
+                        8. Main Entry Point
+   ============================================================================*/
+
 int main()
 {
 
 	StartBankingSystem();
-	
+
 	system("pause>0");
 	return 0;
 }
